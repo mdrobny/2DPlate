@@ -3,8 +3,8 @@
 #include <math.h>
 
 
-#define N 100 			//plate size
-#define MonteN 100000 	//MonteCarlo trys amount
+#define N 10 			//plate size
+#define MonteN 10000	//MonteCarlo trys amount
 
 /**
 *	1-north, 2-east, 3-south, 4-west
@@ -26,8 +26,9 @@ void setEdgeTemp(double p[N][N]){
 		}
 	}
 	
-	for(j=20;j<80;j++)
-	// for(j=2;j<8;j++)
+	// for(j=20;j<80;j++)
+	for(j=2;j<8;j++)
+	// for(j=5;j<15;j++)
 		p[N-1][j] = 100.0;
 	
 	//for(i=3;i<6;i++)
@@ -59,14 +60,17 @@ double walk(double p[N][N],int x, int y){
 *	x,y - cooridinates of point in array
 */
 void temperature(double p[N][N],int x, int y){
-	int i;
+	int n;
 	double accu = 0.0;
 	
-	while(i++ < MonteN){
+	while(n++ < MonteN){
 		accu += walk(p,x,y);
 	}
-	p[x][y] = accu/i;
-	accu=0.0; i=0; //don't remove
+	p[x][y] = accu/n;
+	
+	accu=0.0; n=0; //don't remove
+	
+	//printf("[%d %d] ",x,y);
 }
 
 /**
@@ -102,11 +106,14 @@ int main(int argc, char** argv)
 	
 	setEdgeTemp(p);
 	
+	/*    main loop in plate array	*/
 	int i,j;
-	for(i=1;i<N-1;i++)
-		for(j=1;j<N-1;j++)
+	for(i=1;i<N-1;i++){
+		for(j=1;j<N-1;j++){
+			//printf("[%d %d] ",i,j); <--- BLAD, WYNIKI SIE ZERUJA
 			temperature(p,i,j);
-
+		}
+	}
 			
 	showAndSavePlate(p,0);
 
