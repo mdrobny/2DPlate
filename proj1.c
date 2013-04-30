@@ -88,14 +88,21 @@ void setEdgeTemp(double p[N][N]){
 	int i,j;
 	
 	//init array
+	//change: initializing by -1.0
 	for(i=0;i<N;i++){
 		for(j=0;j<N;j++){
-			p[i][j] = 0.0;
+			p[i][j] = -1.0;
 		}
+	}
+	//change: setting 0.0 on 3 edges
+	for(i = 0 ; i < N ; ++i){
+		p[0][i] = 0.0;
+		p[i][0] = 0.0;
+		p[i][N-1] = 0.0;
 	}
 	
 	// for(j=20;j<80;j++)
-	for(j=2;j<8;j++)
+	for(j=0;j<N;j++)
 	// for(j=5;j<15;j++)
 		p[N-1][j] = 100.0;
 	
@@ -122,6 +129,24 @@ double walk(double p[N][N],int x, int y){
 	return walk(p,x,y);
 }
 
+/**
+*	recursive walk
+*	ends after reaching one of edges
+*/
+double walk2(double p[N][N],int x, int y){
+	switch(randDirection()){
+		case 1:	if(p[--x][y] == -1.0) x;
+			else return p[x][y]; break;
+		case 2:  if(p[x][++y] == -1.0) y;
+			else return p[x][y]; break;
+		case 3:  if(p[++x][y] == -1.0) x;
+			else return p[x][y]; break;
+		case 4:  if(p[x][--y] == -1.0) y;
+			else return p[x][y]; break;
+	}
+	return walk2(p,x,y);
+}
+
 
 /**
 *	find temperature at given point using MonteCarlo method
@@ -132,7 +157,8 @@ void temperature(double p[N][N],int x, int y){
 	double accu = 0.0;
 	
 	while(n++ < MonteN){
-		accu += walk(p,x,y);
+		//accu += walk(p,x,y);
+		accu += walk2(p,x,y);
 	}
 	p[x][y] = accu/n;
 	
@@ -178,9 +204,10 @@ int main(int argc, char** argv)
 	int i,j;
 	for(i=1;i<N-1;i++){
 		for(j=1;j<N-1;j++){
-			//printf("[%d %d] ",i,j); <--- BLAD, WYNIKI SIE ZERUJA
+			printf("[%d %d] ",i,j); //<--- BLAD, WYNIKI SIE ZERUJA <--- tere-fere fcale nie
 			temperature(p,i,j);
 		}
+		printf("\n");
 	}
 			
 	showAndSavePlate(p,0);
