@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "mpi.h"
+//#include "mpe.h"
 
 
 #define N 10 			//plate size
@@ -26,6 +28,7 @@ int MPI_Init(int *argc, char **argv[]){
 	int rank;
 	
 	result = PMPI_Init(argc, argv);
+	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPE_Init_log();
 	if(rank == 0) {
 		MPE_Describe_state(START_BCAST,END_BCAST, "broadcast", "red");
@@ -74,8 +77,7 @@ int MPI_Allreduce( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatyp
 		result = PMPI_Allreduce(sendbuf, recvbuf, count, datatype, op, comm );
 	MPE_Log_event(END_ALLRED,0,"reduciton");
 	return result;
-}
-*/
+}*/
 
 /**
 *	1-north, 2-east, 3-south, 4-west
@@ -155,11 +157,12 @@ double walk2(double p[N][N],int x, int y){
 *	find temperature at given point using MonteCarlo method
 *	x,y - cooridinates of point in array
 */
-void temperature(double p[N][N],int x, int y){
+long temperature(double p[N][N],int x, int y, int worldSize){
 	int i;
-	long n = 0;
+	long n = 0, alln;
 	double accu = 0.0;
 	double temp = 0.0;
+	double ownTemp;
 	double oldTemp = -1.0;
 	
 	while(fabs(temp - oldTemp) > EPS){
@@ -168,14 +171,17 @@ void temperature(double p[N][N],int x, int y){
 			//accu += walk(p,x,y);
 			accu += walk2(p,x,y);
 		}
-		temp = accu/n;
+		ownTemp = accu/n;
+		MPI_Allreduce( &ownTemp, &temp, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+		temp /= worldSize;
 	}
 	p[x][y] = temp;
-	printf("%ld",n);
+	MPI_Allreduce( &n, &alln, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 	
-	accu=0.0; n=0; //don't remove
+	//accu=0.0; n=0; //don't remove // Leo, why?
 	
 	//printf("[%d %d] ",x,y);
+	return alln;
 }
 
 /**
@@ -210,18 +216,29 @@ int main(int argc, char** argv)
 	double p[N][N];
 	
 	setEdgeTemp(p);
+	int worldSize, rank;
 	
 	/*    main loop in plate array	*/
+	MPI_Init(&argc, &argv);
+	MPI_Comm_size( MPI_COMM_WORLD, &worldSize );
+	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	int i,j;
+	long n;
 	for(i=1;i<N-1;i++){
 		for(j=1;j<N-1;j++){
-			printf("[%d %d] ",i,j); //<--- BLAD, WYNIKI SIE ZERUJA <--- tere-fere fcale nie
-			temperature(p,i,j);
+			n = temperature(p,i,j,worldSize);
+			if(rank == 0)
+				printf("[%d %d] %ld ",i,j,n); //<--- BLAD, WYNIKI SIE ZERUJA <--- tere-fere fcale nie
 		}
-		printf("\n");
+		if(rank == 0)
+			printf("\n");
 	}
-			
-	showAndSavePlate(p,0);
+	
+	
+	if(rank == 0)		
+		showAndSavePlate(p,0);
+	
+	MPI_Finalize();
 
 	return 0;
 }
