@@ -5,6 +5,8 @@
 
 #define N 10 			//plate size
 #define MonteN 10000	//MonteCarlo trys amount
+#define EPS 1e-4		//small for faster tests
+
 
 // MPI Logs
 #define START_BCAST 0
@@ -15,6 +17,7 @@
 #define END_RECV 5
 #define START_SEND 6
 #define END_SEND 7
+
 
 //PMPI - for MPI logging
 /*
@@ -131,17 +134,17 @@ double walk(double p[N][N],int x, int y){
 
 /**
 *	recursive walk
-*	ends after reaching one of edges
+*	ends after reaching counted temperature
 */
 double walk2(double p[N][N],int x, int y){
 	switch(randDirection()){
-		case 1:	if(p[--x][y] == -1.0) x;
+		case 1:	if(p[--x][y] < 0) break;
 			else return p[x][y]; break;
-		case 2:  if(p[x][++y] == -1.0) y;
+		case 2:  if(p[x][++y] < 0) break;
 			else return p[x][y]; break;
-		case 3:  if(p[++x][y] == -1.0) x;
+		case 3:  if(p[++x][y] < 0) break;
 			else return p[x][y]; break;
-		case 4:  if(p[x][--y] == -1.0) y;
+		case 4:  if(p[x][--y] < 0) break;
 			else return p[x][y]; break;
 	}
 	return walk2(p,x,y);
@@ -153,14 +156,22 @@ double walk2(double p[N][N],int x, int y){
 *	x,y - cooridinates of point in array
 */
 void temperature(double p[N][N],int x, int y){
-	int n;
+	int i;
+	long n = 0;
 	double accu = 0.0;
+	double temp = 0.0;
+	double oldTemp = -1.0;
 	
-	while(n++ < MonteN){
-		//accu += walk(p,x,y);
-		accu += walk2(p,x,y);
+	while(fabs(temp - oldTemp) > EPS){
+		oldTemp = temp;
+		for( i = 0 ; i < 500 ; ++i, ++n){
+			//accu += walk(p,x,y);
+			accu += walk2(p,x,y);
+		}
+		temp = accu/n;
 	}
-	p[x][y] = accu/n;
+	p[x][y] = temp;
+	printf("%ld",n);
 	
 	accu=0.0; n=0; //don't remove
 	
