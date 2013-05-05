@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "mpi.h"
-//#include "mpe.h"
+#include <mpi.h>
+//#include <mpe.h>
 #define SIMPLE_SPRNG	// simple interface
 #define USE_MPI		//use MPI to find number of processes
 #include "sprng.h"
@@ -27,7 +27,7 @@
 #define SEED 985456376
 
 //PMPI - for MPI logging
-/*
+
 int MPI_Init(int *argc, char **argv[]){
 	int result;
 	int rank;
