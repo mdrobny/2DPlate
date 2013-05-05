@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "mpi.h"
-//#include <mpe.h>
-//#define SIMPLE_SPRNG	// simple interface
-//#define USE_MPI		//use MPI to find number of processes
-//#include "sprng.h"
+#include <mpi.h>
+#include <mpe.h>
+#define SIMPLE_SPRNG	// simple interface
+#define USE_MPI		//use MPI to find number of processes
+#include "sprng.h"
 
 
 #define N 10 			//plate size
@@ -28,7 +28,7 @@
 
 //PMPI - for MPI logging
 
-/*int MPI_Init(int *argc, char **argv[]){
+int MPI_Init(int *argc, char **argv[]){
 	int result;
 	int rank;
 	
@@ -36,10 +36,10 @@
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPE_Init_log();
 	if(rank == 0) {
-		MPE_Describe_state(START_BCAST,END_BCAST, "broadcast", "red");
+		//MPE_Describe_state(START_BCAST,END_BCAST, "broadcast", "red");
 		MPE_Describe_state(START_ALLRED,END_ALLRED, "reduction", "green");
-		MPE_Describe_state(START_RECV,END_RECV, "receive", "blue");
-		MPE_Describe_state(START_SEND,END_SEND, "send", "yellow");
+		//MPE_Describe_state(START_RECV,END_RECV, "receive", "blue");
+		//MPE_Describe_state(START_SEND,END_SEND, "send", "yellow");
 	}
 	MPE_Start_log();	
 	return result;
@@ -52,7 +52,7 @@ int MPI_Finalize(){
 	return result;
 }
 
-int MPI_Bast(void *buffer, int count, MPI_Datatype datatype, int root,MPI_Comm comm){
+/*int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root,MPI_Comm comm){
 	int result;
 	MPE_Log_event(START_BCAST,0,"pierwszy bcast");
 		result = PMPI_Bcast(buffer,count,datatype,root,comm);
@@ -74,15 +74,16 @@ int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, M
 		result = PMPI_Recv(buf, count, datatype, source, tag, comm, status);
 	MPE_Log_event(END_RECV,0,"receive");
 	return result;
-}
+}*/
 
 int MPI_Allreduce( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm ){
 	int result;
 	MPE_Log_event(START_ALLRED,0,"reduciton");
+		//result = PMPI_Allreduce(sendbuf, recvbuf, count, datatype, op, comm );
 		result = PMPI_Allreduce(sendbuf, recvbuf, count, datatype, op, comm );
 	MPE_Log_event(END_ALLRED,0,"reduciton");
 	return result;
-}*/
+}
 
 /**
 *	1-north, 2-east, 3-south, 4-west
