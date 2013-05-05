@@ -28,7 +28,7 @@
 
 //PMPI - for MPI logging
 
-int MPI_Init(int *argc, char **argv[]){
+/*int MPI_Init(int *argc, char **argv[]){
 	int result;
 	int rank;
 	
@@ -82,7 +82,7 @@ int MPI_Allreduce( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatyp
 		result = PMPI_Allreduce(sendbuf, recvbuf, count, datatype, op, comm );
 	MPE_Log_event(END_ALLRED,0,"reduciton");
 	return result;
-}
+}*/
 
 /**
 *	1-north, 2-east, 3-south, 4-west
