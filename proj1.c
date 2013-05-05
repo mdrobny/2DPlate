@@ -5,7 +5,7 @@
 #include <mpe.h>
 #define SIMPLE_SPRNG	// simple interface
 #define USE_MPI		//use MPI to find number of processes
-#include "sprng.h"
+#include <sprng.h>
 
 
 #define N 10 			//plate size
@@ -30,7 +30,7 @@
 
 int MPI_Init(int *argc, char **argv[]){
 	int result;
-	int rank;
+	int rank = 0;
 	
 	result = PMPI_Init(argc, argv);
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
@@ -88,8 +88,11 @@ int MPI_Allreduce( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatyp
 *	1-north, 2-east, 3-south, 4-west
 */
 int randDirection(){
+	#ifdef SPRAND
 	//return isprng()%5+1; //integers
+	#else
 	return rand()%5+1;
+	#endif
 }
 
 /**
@@ -222,7 +225,7 @@ int main(int argc, char** argv)
 	double p[N][N];
 	
 	setEdgeTemp(p);
-	int worldSize, rank;
+	int worldSize, rank = 0;
 	
 	/** SPRNG
 	 * Available generators; use corresponding numeral:
@@ -240,7 +243,9 @@ int main(int argc, char** argv)
 	MPI_Comm_size( MPI_COMM_WORLD, &worldSize );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	
-	//init_sprng(SEED,SPRNG_DEFAULT,gtype);	/* initialize stream*/
+	#ifdef SPRAND
+	init_sprng(SEED,SPRNG_DEFAULT,gtype);	/* initialize stream*/
+	#endif
 	
 	/*    main loop in plate array	*/
 	int i,j;

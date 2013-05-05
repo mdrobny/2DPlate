@@ -1,9 +1,9 @@
 all:
-	mpicc.mpich2 -o proj1 proj1.c -I/usr/lib/mpich/include -I/usr/include/sprng/ -L/usr/lib/mpich/lib -lmpe -lsprng -lmpi -lm
+	mpicc.mpich2 -o proj1 proj1.c -I/usr/lib/mpich/include -I/usr/include/sprng/ -L/usr/lib/mpich/lib -L/usr/lib -lmpe -lsprng -lm
 fatcat:
-	/opt/nfs/mpich-3.0.2/bin/mpicc -o proj1 proj1.c -lmpe -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/mpe2-1.3.0/lib  -lm
-sprng:
 	/opt/nfs/mpich-3.0.2/bin/mpicc -o proj1 proj1.c -lmpe -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/mpe2-1.3.0/lib -I/opt/nfs/sprng4/include -L/opt/nfs/sprng4/lib -lsprng -lm
+sprng:
+	mpicc.mpich2 -o proj1 proj1.c -DSPRAND -I/usr/lib/mpich/include -I/usr/include/sprng/ -L/usr/lib/mpich/lib -L/usr/lib -lmpe -lsprng -lm
 run:
 	mpiexec -n 3 ./proj1
 fatrun:
