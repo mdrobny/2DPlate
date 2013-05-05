@@ -1,7 +1,7 @@
 all:
 	mpicc -o proj1 proj1.c -lm
-mpe:
-	mpicc -o proj1 proj1.c -lmpe -lm
+fatcat:
+	/opt/nfs/mpich-3.0.2/bin/mpic++ -DSIMPLE_SPRNG -DUSE_MPI -o proj1 proj1.c -lmpe -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/mpe2-1.3.0/lib -I/opt/nfs/sprng4/include -L/opt/nfs/sprng4/lib -lsprng -lm
 run:
 	@time mpiexec -n 3 ./proj1
 	@time mpiexec -n 5 ./proj1
