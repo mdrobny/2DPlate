@@ -3,9 +3,12 @@
 #include <math.h>
 #include <mpi.h>
 #include <mpe.h>
-#define SIMPLE_SPRNG	// simple interface
+#ifdef SPRAND
+//#define SIMPLE_SPRNG	// simple interface
 #define USE_MPI		//use MPI to find number of processes
 #include <sprng.h>
+
+#endif
 
 
 #define N 10 			//plate size
@@ -26,7 +29,14 @@
 //SPRNG
 #define SEED 985456376
 
+
+#ifdef SPRAND
+int *stream;
+#endif
+
 //PMPI - for MPI logging
+
+
 
 int MPI_Init(int *argc, char **argv[]){
 	int result;
@@ -90,6 +100,7 @@ int MPI_Allreduce( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatyp
 int randDirection(){
 	#ifdef SPRAND
 	//return isprng()%5+1; //integers
+	return isprng(stream)%5+1; //integers
 	#else
 	return rand()%5+1;
 	#endif
@@ -227,6 +238,7 @@ int main(int argc, char** argv)
 	setEdgeTemp(p);
 	int worldSize, rank = 0;
 	
+	
 	/** SPRNG
 	 * Available generators; use corresponding numeral:
 		   lfg     --- 0 
@@ -244,7 +256,9 @@ int main(int argc, char** argv)
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	
 	#ifdef SPRAND
-	init_sprng(SEED,SPRNG_DEFAULT,gtype);	/* initialize stream*/
+	//int *stream;
+	//init_sprng(SEED,SPRNG_DEFAULT,gtype);	/* initialize stream*/
+	stream = init_sprng(gtype,rank,worldSize,SEED,SPRNG_DEFAULT);
 	#endif
 	
 	/*    main loop in plate array	*/
@@ -263,6 +277,10 @@ int main(int argc, char** argv)
 	
 	if(rank == 0)		
 		showAndSavePlate(p,0);
+		
+	#ifdef SPRAND
+	free_sprng(stream);
+	#endif
 	
 	MPI_Finalize();
 
