@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <math.h>
 #include <mpi.h>
-#include <mpe.h>
+//#include <mpe.h>
 #define SIMPLE_SPRNG	// simple interface
 #define USE_MPI		//use MPI to find number of processes
-#include "sprng.h"
+//#include "sprng.h"
 
 
 #define N 10 			//plate size
@@ -240,7 +240,7 @@ int main(int argc, char** argv)
 	MPI_Comm_size( MPI_COMM_WORLD, &worldSize );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	
-	init_sprng(SEED,SPRNG_DEFAULT,gtype);	/* initialize stream*/
+	//init_sprng(SEED,SPRNG_DEFAULT,gtype);	/* initialize stream*/
 	
 	/*    main loop in plate array	*/
 	int i,j;
