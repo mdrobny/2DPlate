@@ -88,8 +88,8 @@ int MPI_Allreduce( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatyp
 *	1-north, 2-east, 3-south, 4-west
 */
 int randDirection(){
-	return isprng()%5+1; //integers
-	//return rand()%5+1;
+	//return isprng()%5+1; //integers
+	return rand()%5+1;
 }
 
 /**
