@@ -269,7 +269,7 @@ int main(int argc, char** argv)
 					temp /= worldSize;
 				}
 				p[i][j] = temp;
-				MPI_Allreduce( &n, &alln, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+				//MPI_Allreduce( &n, &alln, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 			
 			//if(rank == 0)
 				//printf("[%d %d] %ld ",i,j,n); //<--- BLAD, WYNIKI SIE ZERUJA <--- tere-fere fcale nie
