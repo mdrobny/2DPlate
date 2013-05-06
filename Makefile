@@ -1,19 +1,9 @@
 all:
 	mpicc -o proj1 proj1.c  -lm
-mmpe:
-	mpicc -o proj1 proj1.c -DMMPE -I/usr/lib/mpich/include -L/usr/lib/mpich/lib/ -lmpe -lm
-sprng:
-	mpicc -o proj1 proj1.c -DSPRAND -I/usr/lib/mpich/include -I/usr/include/sprng/ -L/usr/lib/mpich/lib/ -lmpe -lsprng -lm
 fatcat:
 	/opt/nfs/mpich-3.0.2/bin/mpicxx -DSIMPLE_SPRNG -DUSE_MPI proj1.c -I/opt/nfs/sprng4/include -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/sprng4/lib -L/opt/nfs/mpe2-1.3.0/lib -lsprng -lmpe -lm
-fatcat-mmpe:
-	/opt/nfs/mpich-3.0.2/bin/mpicxx -DSIMPLE_SPRNG -DMMPE -DSPRAND -DUSE_MPI proj1.c -I/opt/nfs/sprng4/include -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/sprng4/lib -L/opt/nfs/mpe2-1.3.0/lib -lsprng -lmpe -lm
 fatcat-ampe:
 	/opt/nfs/mpich-3.0.2/bin/mpicxx -DSIMPLE_SPRNG -DAMPE -DSPRAND -DUSE_MPI proj1.c -I/opt/nfs/sprng4/include -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/sprng4/lib -L/opt/nfs/mpe2-1.3.0/lib -lsprng -lmpe -lm
-sprng-mpe:
-	mpicc -o proj1 proj1.c -DSPRAND -DAMPE -I/usr/lib/mpich/include -I/usr/include/sprng/ -L/usr/lib/mpich/lib/ -lmpe -lsprng -lm
-mpe:
-	mpicc -o proj1 proj1.c -DAMPE -I/usr/lib/mpich/include -L/usr/lib/mpich/lib -L/usr/lib -lmpe -lm
 run:
 	mpiexec -n 3 ./proj1
 	gnuplot wykres.gp
@@ -26,11 +16,9 @@ tests:
 	@gnuplot wykres.gp
 help:
 	@echo 'Użycie:'
-	@echo 'all: ogólna kompilacja (działa u mnie - linux mint) MPI + manual MPE'
+	@echo 'all: ogólna kompilacja  MPI(bez sprng i MPE)'
 	@echo 'fatcat: kompilacja na komputerze pracowni'
-	@echo 'sprng: kompilacja u mnie ze sprng2 + manual MPE'
-	@echo 'sprng-mpe: kompilacja u mnie ze sprng2 + auto MPE'
-	@echo 'mpe: kompilacja u mnie  auto MPE'
+	@echo 'fatcat-ampe: kompilacja na fatcacie z automatycznymi logami'
 	@echo 'run: uruchomienie na 3 procesach + rysowanie wykresu'
-	@echo 'fatrun: uruchamianie na fatcacie'
+	@echo 'fatrun: uruchamianie na fatcacie na 3 procesach + rysowanie wykresu'
 	@echo 'tests: testy czasowe dla 2 4 i 6 procesów (na fatcacie)'

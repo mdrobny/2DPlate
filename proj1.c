@@ -10,7 +10,7 @@
 #endif
 #ifdef SPRAND
 //#define SIMPLE_SPRNG	// simple interface
-#define USE_MPI		//use MPI to find number of processes
+//#define USE_MPI		//use MPI to find number of processes
 #include <sprng.h>
 #endif
 
