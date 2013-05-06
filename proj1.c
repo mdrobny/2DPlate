@@ -263,9 +263,6 @@ int main(int argc, char** argv)
 	if(rank == 0)		
 		showAndSavePlate(p,0);
 		
-	#ifdef SPRAND
-	free_sprng(stream);
-	#endif
 	
 	#ifdef MMPE
 	MPE_Finish_log("logs");
