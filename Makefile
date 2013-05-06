@@ -8,8 +8,8 @@ fatcat:
 	/opt/nfs/mpich-3.0.2/bin/mpicxx -DSIMPLE_SPRNG -DUSE_MPI proj1.c -I/opt/nfs/sprng4/include -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/sprng4/lib -L/opt/nfs/mpe2-1.3.0/lib -lsprng -lmpe -lm
 fatcat-mmpe:
 	/opt/nfs/mpich-3.0.2/bin/mpicxx -DSIMPLE_SPRNG -DMMPE -DSPRAND -DUSE_MPI proj1.c -I/opt/nfs/sprng4/include -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/sprng4/lib -L/opt/nfs/mpe2-1.3.0/lib -lsprng -lmpe -lm
-fatcat-sprng:
-	/opt/nfs/mpich-3.0.2/bin/mpicc -o proj1 proj1.c -DSPRAND -I/opt/nfs/sprng4/include -L/opt/nfs/sprng4/lib -lsprng -lm
+fatcat-ampe:
+	/opt/nfs/mpich-3.0.2/bin/mpicxx -DSIMPLE_SPRNG -DAMPE -DSPRAND -DUSE_MPI proj1.c -I/opt/nfs/sprng4/include -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/sprng4/lib -L/opt/nfs/mpe2-1.3.0/lib -lsprng -lmpe -lm
 sprng-mpe:
 	mpicc -o proj1 proj1.c -DSPRAND -DAMPE -I/usr/lib/mpich/include -I/usr/include/sprng/ -L/usr/lib/mpich/lib/ -lmpe -lsprng -lm
 mpe:
