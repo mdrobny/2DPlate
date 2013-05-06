@@ -252,7 +252,7 @@ int main(int argc, char** argv)
 		for(j=1;j<N-1;j++){
 			//n = temperature(p,i,j,worldSize);
 			
-				int i;
+				int k;
 				long n = 0, alln;
 				double accu = 0.0;
 				double temp = 0.0;
@@ -261,14 +261,14 @@ int main(int argc, char** argv)
 				
 				while(fabs(temp - oldTemp) > EPS){
 					oldTemp = temp;
-					for( i = 0 ; i < 500 ; ++i, ++n){
-						accu += walk2(p,x,y);
+					for( k = 0 ; k < 500 ; ++k, ++n){
+						accu += walk2(p,i,j);
 					}
-					ownTemp = accu/nb;
+					ownTemp = accu/n;
 					MPI_Allreduce( &ownTemp, &temp, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 					temp /= worldSize;
 				}
-				p[x][y] = temp;
+				p[i][j] = temp;
 				MPI_Allreduce( &n, &alln, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 			
 			//if(rank == 0)
