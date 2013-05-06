@@ -5,9 +5,6 @@
 #ifdef AMPE
 #include <mpe.h>
 #endif
-#ifdef MMPE
-#include <mpe.h>
-#endif
 #ifdef SPRAND
 //#define SIMPLE_SPRNG	// simple interface
 //#define USE_MPI		//use MPI to find number of processes
@@ -15,27 +12,17 @@
 #endif
 
 
-#define N 10 			//plate size
+#define N 10 		//plate size
 #define MonteN 10000	//MonteCarlo trys amount
-#define EPS 1e-4		//small for faster tests
+#define EPS 1e-4	//small for faster tests
 
 
 // MPI Logs
-#define START_BCAST 0
-#define END_BCAST 1
 #define START_ALLRED 2
 #define END_ALLRED 3
-#define START_RECV 4
-#define END_RECV 5
-#define START_SEND 6
-#define END_SEND 7
 
 //SPRNG
 #define SEED 985456376
-
-#ifdef SPRAND
-int *stream;
-#endif
 
 //PMPI - for MPI logging
 
@@ -48,10 +35,7 @@ int MPI_Init(int *argc, char **argv[]){
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPE_Init_log();
 	if(rank == 0) {
-		//MPE_Describe_state(START_BCAST,END_BCAST, "broadcast", "red");
 		MPE_Describe_state(START_ALLRED,END_ALLRED, "reduction", "green");
-		//MPE_Describe_state(START_RECV,END_RECV, "receive", "blue");
-		//MPE_Describe_state(START_SEND,END_SEND, "send", "yellow");
 	}
 	MPE_Start_log();	
 	return result;
@@ -63,30 +47,6 @@ int MPI_Finalize(){
 	result = PMPI_Finalize();	
 	return result;
 }
-
-/*int MPI_Bcast(void *buffer, int count, MPI_Datatype datatype, int root,MPI_Comm comm){
-	int result;
-	MPE_Log_event(START_BCAST,0,"pierwszy bcast");
-		result = PMPI_Bcast(buffer,count,datatype,root,comm);
-	MPE_Log_event(END_BCAST,0,"pierwszy bcast");
-	return result;
-}
-
-int MPI_Send(void *buf, int count, MPI_Datatype datatype, int dest, int tag,MPI_Comm comm) {
-	int result;
-	MPE_Log_event(START_SEND,0,"send");
-		result = PMPI_Send(buf, count, datatype, dest, tag, comm);
-	MPE_Log_event(END_SEND,0,"send");
-	return result;
-}
-
-int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status){
-	int result;
-	MPE_Log_event(START_RECV,0,"receive");
-		result = PMPI_Recv(buf, count, datatype, source, tag, comm, status);
-	MPE_Log_event(END_RECV,0,"receive");
-	return result;
-}*/
 
 int MPI_Allreduce( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm ){
 	int result;
@@ -164,9 +124,10 @@ long temperature(double p[N][N],int x, int y, int worldSize){
 	
 	while(fabs(temp - oldTemp) > EPS){
 		oldTemp = temp;
-		for( i = 0 ; i < 500 ; ++i, ++n){
+		for( i = 0 ; i < 500 ; ++i){
 			accu += walk2(p,x,y);
 		}
+		n+=500;
 		ownTemp = accu/n;
 		MPI_Allreduce( &ownTemp, &temp, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 		temp /= worldSize;
@@ -214,12 +175,12 @@ int main(int argc, char** argv)
 	
 	/** SPRNG
 	 * Available generators; use corresponding numeral:
-		   lfg     --- 0 
-		   lcg     --- 1 
-		   lcg64     --- 2 
-		   cmrg     --- 3 
-		   mlfg     --- 4 
-		   pmlcg     --- 5 
+	   lfg     --- 0 
+	   lcg     --- 1 
+	   lcg64     --- 2 
+	   cmrg     --- 3 
+	   mlfg     --- 4 
+	   pmlcg     --- 5 
 	 */
 	int gtype;
 	gtype = 0;
@@ -228,17 +189,7 @@ int main(int argc, char** argv)
 	MPI_Comm_size( MPI_COMM_WORLD, &worldSize );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	
-	
-	#ifdef MMPE
-	MPE_Init_log();
-	if(rank == 0) {
-		MPE_Describe_state(START_ALLRED,END_ALLRED, "reduction", "green");
-	}
-	MPE_Start_log();
-	#endif
-	
 	#ifdef SPRAND
-	//int *stream;
 	//SPRNG4
 	init_sprng(SEED,SPRNG_DEFAULT,gtype);	/* initialize stream*/
 	//SPRNG2
@@ -253,7 +204,7 @@ int main(int argc, char** argv)
 			n = temperature(p,i,j,worldSize);
 			
 			if(rank == 0)
-				printf("[%d %d] %ld ",i,j,n); //<--- BLAD, WYNIKI SIE ZERUJA <--- tere-fere fcale nie
+				printf("[%d %d] %ld ",i,j,n);
 		}
 		if(rank == 0)
 			printf("\n");
@@ -262,11 +213,7 @@ int main(int argc, char** argv)
 	printf("Counted\n");
 	if(rank == 0)		
 		showAndSavePlate(p,0);
-		
-	
-	#ifdef MMPE
-	MPE_Finish_log("logs");
-	#endif
+
 	
 	MPI_Finalize();
 
