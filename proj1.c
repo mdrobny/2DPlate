@@ -154,7 +154,7 @@ double walk2(double p[N][N],int x, int y){
 *	find temperature at given point using MonteCarlo method
 *	x,y - cooridinates of point in array
 */
-inline long temperature(double p[N][N],int x, int y, int worldSize){
+/*void temperature(double p[N][N],int x, int y, int worldSize){
 	int i;
 	long n = 0, alln;
 	double accu = 0.0;
@@ -176,7 +176,7 @@ inline long temperature(double p[N][N],int x, int y, int worldSize){
 	
 	return alln;
 }
-
+*/
 /**
 *	if out==1 shows plate at std output
 *	save plate in file in format to generate pm3d map
@@ -250,12 +250,32 @@ int main(int argc, char** argv)
 	long n;
 	for(i=1;i<N-1;i++){
 		for(j=1;j<N-1;j++){
-			n = temperature(p,i,j,worldSize);
-			if(rank == 0)
-				printf("[%d %d] %ld ",i,j,n); //<--- BLAD, WYNIKI SIE ZERUJA <--- tere-fere fcale nie
+			//n = temperature(p,i,j,worldSize);
+			
+				int i;
+				long n = 0, alln;
+				double accu = 0.0;
+				double temp = 0.0;
+				double ownTemp;
+				double oldTemp = -1.0;
+				
+				while(fabs(temp - oldTemp) > EPS){
+					oldTemp = temp;
+					for( i = 0 ; i < 500 ; ++i, ++n){
+						accu += walk2(p,x,y);
+					}
+					ownTemp = accu/nb;
+					MPI_Allreduce( &ownTemp, &temp, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+					temp /= worldSize;
+				}
+				p[x][y] = temp;
+				MPI_Allreduce( &n, &alln, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+			
+			//if(rank == 0)
+				//printf("[%d %d] %ld ",i,j,n); //<--- BLAD, WYNIKI SIE ZERUJA <--- tere-fere fcale nie
 		}
-		if(rank == 0)
-			printf("\n");
+		//if(rank == 0)
+			//printf("\n");
 	}
 	
 	printf("Counted\n");
