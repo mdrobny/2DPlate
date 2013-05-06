@@ -5,11 +5,13 @@
 #ifdef AMPE
 #include <mpe.h>
 #endif
+#ifdef MMPE
+#include <mpe.h>
+#endif
 #ifdef SPRAND
 //#define SIMPLE_SPRNG	// simple interface
 #define USE_MPI		//use MPI to find number of processes
 #include <sprng.h>
-
 #endif
 
 
@@ -238,7 +240,7 @@ int main(int argc, char** argv)
 	double p[N][N];
 	
 	setEdgeTemp(p);
-	int worldSize, rank = 0;
+	int worldSize, rank;
 	
 	
 	/** SPRNG
@@ -257,12 +259,13 @@ int main(int argc, char** argv)
 	MPI_Comm_size( MPI_COMM_WORLD, &worldSize );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	
-	#ifndef AMPE
+	
+	#ifdef MMPE
 	MPE_Init_log();
 	if(rank == 0) {
 		MPE_Describe_state(START_ALLRED,END_ALLRED, "reduction", "green");
 	}
-	MPE_Start_log();	
+	MPE_Start_log();
 	#endif
 	
 	#ifdef SPRAND
@@ -294,7 +297,7 @@ int main(int argc, char** argv)
 	free_sprng(stream);
 	#endif
 	
-	#ifndef AMPE
+	#ifdef MMPE
 	MPE_Finish_log("logs");
 	#endif
 	

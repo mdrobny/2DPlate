@@ -1,15 +1,21 @@
 all:
-	mpicc.mpich -o proj1 proj1.c -I/usr/lib/mpich/include -L/usr/lib/mpich/lib/ -lmpe -lm
+	mpicc -o proj1 proj1.c  -lm
+mmpe:
+	mpicc -o proj1 proj1.c -DMMPE -I/usr/lib/mpich/include -L/usr/lib/mpich/lib/ -lmpe -lm
 sprng:
-	mpicc.mpich -o proj1 proj1.c -DSPRAND -I/usr/lib/mpich/include -I/usr/include/sprng/ -L/usr/lib/mpich/lib/ -lmpe -lsprng -lm
+	mpicc -o proj1 proj1.c -DSPRAND -I/usr/lib/mpich/include -I/usr/include/sprng/ -L/usr/lib/mpich/lib/ -lmpe -lsprng -lm
 fatcat:
-	/opt/nfs/mpich-3.0.2/bin/mpicc -o proj1 proj1.c -lmpe -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/mpe2-1.3.0/lib -I/opt/nfs/sprng4/include -L/opt/nfs/sprng4/lib -lsprng -lm
+	/opt/nfs/mpich-3.0.2/bin/mpicc -o proj1 proj1.c  -lm
+fatcat-mmpe:
+	/opt/nfs/mpich-3.0.2/bin/mpicc -o proj1 proj1.c -DMMPE -lmpe -I/opt/nfs/mpe2-1.3.0/include -L/opt/nfs/mpe2-1.3.0/lib -I/opt/nfs/sprng4/include -L/opt/nfs/sprng4/lib -lsprng -lm
+fatcat-sprng:
+	/opt/nfs/mpich-3.0.2/bin/mpicc -o proj1 proj1.c -DSPRAND -I/opt/nfs/sprng4/include -L/opt/nfs/sprng4/lib -lsprng -lm
 sprng-mpe:
-	mpicc.mpich -o proj1 proj1.c -DSPRAND -DAMPE -I/usr/lib/mpich/include -I/usr/include/sprng/ -L/usr/lib/mpich/lib/ -lmpe -lsprng -lm
+	mpicc -o proj1 proj1.c -DSPRAND -DAMPE -I/usr/lib/mpich/include -I/usr/include/sprng/ -L/usr/lib/mpich/lib/ -lmpe -lsprng -lm
 mpe:
-	mpicc.mpich -o proj1 proj1.c -DAMPE -I/usr/lib/mpich/include -L/usr/lib/mpich/lib -L/usr/lib -lmpe -lm
+	mpicc -o proj1 proj1.c -DAMPE -I/usr/lib/mpich/include -L/usr/lib/mpich/lib -L/usr/lib -lmpe -lm
 run:
-	mpiexec.mpich2 -n 3 ./proj1
+	mpiexec -n 3 ./proj1
 	gnuplot wykres.gp
 fatrun:
 	/opt/nfs/mpich-3.0.2/bin/mpiexec -n 3 ./proj1
