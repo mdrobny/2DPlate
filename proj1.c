@@ -102,8 +102,8 @@ int MPI_Allreduce( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatyp
 */
 int randDirection(){
 	#ifdef SPRAND
-	//return isprng()%5+1; //integers
-	return isprng(stream)%5+1; //integers
+	return isprng()%5+1; //integers
+	//return isprng(stream)%5+1; //integers
 	#else
 	return rand()%5+1;
 	#endif
@@ -240,9 +240,9 @@ int main(int argc, char** argv)
 	#ifdef SPRAND
 	//int *stream;
 	//SPRNG4
-	//init_sprng(SEED,SPRNG_DEFAULT,gtype);	/* initialize stream*/
+	init_sprng(SEED,SPRNG_DEFAULT,gtype);	/* initialize stream*/
 	//SPRNG2
-	stream = init_sprng(gtype,rank,worldSize,SEED,SPRNG_DEFAULT);
+	//stream = init_sprng(gtype,rank,worldSize,SEED,SPRNG_DEFAULT);
 	#endif
 	
 	/*    main loop in plate array	*/
