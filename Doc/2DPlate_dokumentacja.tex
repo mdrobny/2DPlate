@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper]{article}
+\documentclass[11pt,a4paper]{article}
 \usepackage[polish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{polski}
@@ -37,7 +37,33 @@
 \end{figure}
 \newpage
 
-\section{Tytuł projektu i autorzy projektu}
+\section{Wstęp}
+Program służy do obliczania temperatury na płytce dwuwymiarowej w oparciu o znaną temperaturę na brzegach za pomocą metody Monte Carlo. Płytkę dzieli się na siatkę o wymiarach N na N i dla każdej kratki oblicza się temperaturę w sposób iteracyjny:
+\begin{enumerate}
+\item Losowo wybiera kratkę na podstawie kierunku (góra, dół, prawo, lewo)
+\item Sprawdza się temperaturę kratki która została wybrana, jeśli jest znana, to dodaje się ją do sumy temperatur, jeśli nie, to wraca się do poprzedniego punktu i szuka się temperatury dla wybranej kratki.
+\item Po dotarciu do znanej temperatury dodaje się ją do sumy temperatur
+\end{enumerate}
+Temperatura danego punktu to suma temperatur podzielona przez ilość iteracji. Iterowanie się kończy, kiedy temperatura staje się zbieżna (różnica pomiędzy kolejnymi obliczonymi temperaturami jest dostatecznie mała).
+
+\section{Opis implementacji algorytmu}
+Powyższy algorytm został zaimplementowany z jedną różnicą: na potrzeby wielowątkowości każdy proces oblicza 500 próbek temperatur (niezależnie od tego, czy się zbiegają, czy nie) i następnie oblicza temperaturę. Następnie każdy proces liczy średnią temperatur obliczonych przez wszystkie procesy (AllReduce) i na tej podstawie decyduje, czy kontynuować obliczenia. Sprawdzanie zbieżności temperatury co 500 próbek powoduje, że narzut komunikacyjny pomiędzy procesami nie jest większy niż czas obliczeń.
+
+Obliczone i początkowe temperatury przechowujemy w tablicy o wymiarach N na N. Wszystkie temperatury oprócz brzegowych są zainicjalizowane wartością -1 (można tak zrobić, ponieważ Kelwiny nie przyjmują ujemnych wartości). Brzegowe temperatury są inicjalizowane zgodnie z treścią zadania: trzy ściany $0^{\circ}$ i czwarta $100^{\circ}$. Dlatego znana temperatura to temperatura większa lub równa $0^{\circ}$.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{schemat1.png}
+\caption{Schemat blokowy obliczania temperatury w punkcie danym współrzędnymi x i y}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{schemat2.png}
+\caption{Schemat blokowy poszukiwania znanej temperatury}
+\end{center}
+\end{figure}
 
 
 \end{document}

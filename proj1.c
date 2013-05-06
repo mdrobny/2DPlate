@@ -12,7 +12,7 @@
 #endif
 
 
-#define N 10 		//plate size
+#define N 20 		//plate size
 #define MonteN 10000	//MonteCarlo trys amount
 #define EPS 1e-4	//small for faster tests
 
