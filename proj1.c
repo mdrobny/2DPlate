@@ -33,7 +33,6 @@
 //SPRNG
 #define SEED 985456376
 
-
 #ifdef SPRAND
 int *stream;
 #endif
