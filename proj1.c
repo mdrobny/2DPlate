@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <mpi.h>
+#ifdef AMPE
 #include <mpe.h>
+#endif
 #ifdef SPRAND
 //#define SIMPLE_SPRNG	// simple interface
 #define USE_MPI		//use MPI to find number of processes
@@ -36,8 +38,7 @@ int *stream;
 
 //PMPI - for MPI logging
 
-
-
+#ifdef AMPE
 int MPI_Init(int *argc, char **argv[]){
 	int result;
 	int rank = 0;
@@ -93,6 +94,7 @@ int MPI_Allreduce( void *sendbuf, void *recvbuf, int count, MPI_Datatype datatyp
 	MPE_Log_event(END_ALLRED,0,"reduciton");
 	return result;
 }
+#endif
 
 /**
 *	1-north, 2-east, 3-south, 4-west
@@ -228,7 +230,7 @@ void showAndSavePlate(double p[N][N], int out){
 
 /**
 *	program implements problem of:
-*		Finding temperature at a point inside a 2D plate using MonteCarlo method
+*		Finding temperature at a point inside a 2D plate using MonteCarlo method. Temperature is in kelvin
 */
 
 int main(int argc, char** argv)
@@ -251,13 +253,23 @@ int main(int argc, char** argv)
 	int gtype;
 	gtype = 0;
 	
-	MPI_Init(&argc, &argv);
+	MPI_Init( &argc, &argv );
 	MPI_Comm_size( MPI_COMM_WORLD, &worldSize );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	
+	#ifndef AMPE
+	MPE_Init_log();
+	if(rank == 0) {
+		MPE_Describe_state(START_ALLRED,END_ALLRED, "reduction", "green");
+	}
+	MPE_Start_log();	
+	#endif
+	
 	#ifdef SPRAND
 	//int *stream;
+	//SPRNG4
 	//init_sprng(SEED,SPRNG_DEFAULT,gtype);	/* initialize stream*/
+	//SPRNG2
 	stream = init_sprng(gtype,rank,worldSize,SEED,SPRNG_DEFAULT);
 	#endif
 	
@@ -274,12 +286,16 @@ int main(int argc, char** argv)
 			printf("\n");
 	}
 	
-	
+	printf("Counted\n");
 	if(rank == 0)		
 		showAndSavePlate(p,0);
 		
 	#ifdef SPRAND
 	free_sprng(stream);
+	#endif
+	
+	#ifndef AMPE
+	MPE_Finish_log("logs");
 	#endif
 	
 	MPI_Finalize();
