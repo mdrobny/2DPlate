@@ -116,46 +116,20 @@ int randDirection(){
 void setEdgeTemp(double p[N][N]){
 	int i,j;
 	
-	//init array
-	//change: initializing by -1.0
 	for(i=0;i<N;i++){
 		for(j=0;j<N;j++){
 			p[i][j] = -1.0;
 		}
 	}
-	//change: setting 0.0 on 3 edges
 	for(i = 0 ; i < N ; ++i){
 		p[0][i] = 0.0;
 		p[i][0] = 0.0;
 		p[i][N-1] = 0.0;
 	}
 	
-	// for(j=20;j<80;j++)
 	for(j=0;j<N;j++)
-	// for(j=5;j<15;j++)
 		p[N-1][j] = 100.0;
 	
-	//for(i=3;i<6;i++)
-	//	p[i][0] = 100.0;
-	
-}
-
-/**
-*	recursive walk
-*	ends after reaching one of edges
-*/
-double walk(double p[N][N],int x, int y){
-	switch(randDirection()){
-		case 1:	if(x-1 != 0) x--;
-			else return p[0][y]; break;
-		case 2:  if(y+1 != N-1) y++;
-			else return p[x][N-1]; break;
-		case 3:  if(x+1 != N-1) x++;
-			else return p[N-1][y]; break;
-		case 4:  if(y-1 != 0) y--;
-			else return p[x][0]; break;
-	}
-	return walk(p,x,y);
 }
 
 /**
@@ -192,7 +166,6 @@ long temperature(double p[N][N],int x, int y, int worldSize){
 	while(fabs(temp - oldTemp) > EPS){
 		oldTemp = temp;
 		for( i = 0 ; i < 500 ; ++i, ++n){
-			//accu += walk(p,x,y);
 			accu += walk2(p,x,y);
 		}
 		ownTemp = accu/n;
@@ -202,9 +175,6 @@ long temperature(double p[N][N],int x, int y, int worldSize){
 	p[x][y] = temp;
 	MPI_Allreduce( &n, &alln, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 	
-	//accu=0.0; n=0; //don't remove // Leo, why?
-	
-	//printf("[%d %d] ",x,y);
 	return alln;
 }
 
