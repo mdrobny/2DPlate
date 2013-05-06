@@ -154,7 +154,7 @@ double walk2(double p[N][N],int x, int y){
 *	find temperature at given point using MonteCarlo method
 *	x,y - cooridinates of point in array
 */
-long temperature(double p[N][N],int x, int y, int worldSize){
+inline long temperature(double p[N][N],int x, int y, int worldSize){
 	int i;
 	long n = 0, alln;
 	double accu = 0.0;
