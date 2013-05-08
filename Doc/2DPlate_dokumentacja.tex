@@ -12,6 +12,7 @@
 \usepackage{amsmath}
 \usepackage{listings}
 \usepackage{color}
+\usepackage{epstopdf}
 \lstset{
         basicstyle=\ttfamily,
         language=C,
@@ -38,13 +39,27 @@
 \newpage
 
 \section{Wstęp}
-Program służy do obliczania temperatury na płytce dwuwymiarowej w oparciu o znaną temperaturę na brzegach za pomocą metody Monte Carlo. Płytkę dzieli się na siatkę o wymiarach N na N i dla każdej kratki oblicza się temperaturę w sposób iteracyjny:
+
+Program służy do obliczania temperatury na płytce dwuwymiarowej w oparciu o znaną temperaturę na brzegach za pomocą metody Monte Carlo. Płytka dzielona jest na siatkę N na N.\\
+Rozkład temperatury wewnątrz jest opisana przez równanie Laplace'a, tzn. że temp. w każdym punkcie jest średnią temp. punktów otaczających go (z góry, prawej, dołu i lewej).\\
+\\
+Metoda \textbf{Monte Carlo} używana jest do wyznaczenia temp. w danym punkcie S, poprzez:
 \begin{enumerate}
-\item Losowo wybiera kratkę na podstawie kierunku (góra, dół, prawo, lewo)
-\item Sprawdza się temperaturę kratki która została wybrana, jeśli jest znana, to dodaje się ją do sumy temperatur, jeśli nie, to wraca się do poprzedniego punktu i szuka się temperatury dla wybranej kratki.
-\item Po dotarciu do znanej temperatury dodaje się ją do sumy temperatur
+	\item Losowe wybranie jednego z 4 sąsiadów
+	\item Dodawanie jego temperatury do sumy
+	\item Przeprowadzenie powyższych operacji n razy
+	\item Podzielenie sumy przez n
 \end{enumerate}
-Temperatura danego punktu to suma temperatur podzielona przez ilość iteracji. Iterowanie się kończy, kiedy temperatura staje się zbieżna (różnica pomiędzy kolejnymi obliczonymi temperaturami jest dostatecznie mała).
+Wynikiem końcowym jest przybliżona \textbf{temperatura w punkcie S}.\\
+\\
+Ponieważ nie znane są temp. sąsiadów, więc używając tej samej metody można wyznaczyć ich temperatury rekursywnie, poprzez \textbf{losowe przechodzenie} po płytce. Rekursja skończy się, ponieważ napotka jedną z krawędzi na której temp. jest znana.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.4\textwidth]{random_walk.png}
+\caption{Schemat losowego przechodzenia po płytce}
+\end{center}
+\end{figure}
 
 \section{Opis implementacji algorytmu}
 Powyższy algorytm został zaimplementowany z jedną różnicą: na potrzeby wielowątkowości każdy proces oblicza 500 próbek temperatur (niezależnie od tego, czy się zbiegają, czy nie) i następnie oblicza temperaturę. Następnie każdy proces liczy średnią temperatur obliczonych przez wszystkie procesy (AllReduce) i na tej podstawie decyduje, czy kontynuować obliczenia. Sprawdzanie zbieżności temperatury co 500 próbek powoduje, że narzut komunikacyjny pomiędzy procesami nie jest większy niż czas obliczeń.
@@ -53,7 +68,7 @@ Obliczone i początkowe temperatury przechowujemy w tablicy o wymiarach N na N. 
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=0.7\textwidth]{schemat1.png}
+\includegraphics[width=0.8\textwidth]{schemat1.png}
 \caption{Schemat blokowy obliczania temperatury w punkcie danym współrzędnymi x i y}
 \end{center}
 \end{figure}
@@ -65,13 +80,40 @@ Obliczone i początkowe temperatury przechowujemy w tablicy o wymiarach N na N. 
 \end{center}
 \end{figure}
 
-\section{Wyniki}
+
+
+\section{Prezentacja i interpretacja wyników}
+
+Płytka została zainicjalizowana w następujący sposób:
+\begin{enumerate}
+	\item Krawędzie dolna, lewa, górna mają temperaturę $0^{\circ}$
+	\item Krawędź prawa ma temperaturę $100^{\circ}$
+\end{enumerate}
 
 \begin{figure}[H]
 \begin{center}
-\includegraphics[width=0.7\textwidth,angle=-90]{grid.eps}
-\caption{Schemat blokowy poszukiwania znanej temperatury}
+\includegraphics[width=0.7\textwidth]{grid.png}
+%\includegraphics[width=0.7\textwidth,angle=-90]{grid.eps}
+\caption{Wykres płytki w 2-D}
 \end{center}
 \end{figure}
+
+Jak widać na powyższym wykresie płaszczyzny, najwyższa temp. jest przy prawej krawędzi, stopniowo malejąc w kierunku przeciwnym, w dół oraz w górę, co jest zgodne z oczekiwanym rozkładem temperatury na płytce.
+
+\section{Opis uruchamiania programu}
+
+Kompilację i uruchomienie programu, można przeprowadzić używając dostarczonego wraz z programem pliku \textbf{Makefile}.\\
+Do kompilacji można wykorzystać polecenia:
+\begin{enumerate}
+	\item \textbf{'make all'} - ogólna kompilacja  MPI(bez sprng i MPE)
+	\item \textbf{'fatcat'} - kompilacja na komputerze serwera wydziałowego fatcat
+	\item \textbf{'fatcat-ampe'} - kompilacja na komputerze serwera wydziałowego fatcat z automatycznymi logami
+\end{enumerate}
+Do uruchomienia można wykorzystać polecenia:
+\begin{enumerate}
+	\item \textbf{'run'} - uruchomienie na 3 procesach z rysowaniem wykresu
+	\item \textbf{'fatrun'} - kompilacja na komputerze serwera wydziałowego fatcat na 3 procesach z rysowaniem wykresu
+	\item \textbf{'tests'} - testy czasowe dla 2, 4 i 6 procesów (na komputerze serwera wydziałowego fatcat)
+\end{enumerate}
 
 \end{document}
